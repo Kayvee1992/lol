@@ -1,3 +1,4 @@
+from background import Background
 import pygame
 from egg import *
 from road import Road
@@ -29,6 +30,7 @@ all_sprites = pygame.sprite.Group()
 # Drawing the window
 def draw_window(egg_displacement = 0):
     screen.fill(WHITE)
+    bg.draw_bg()
     draw_and_update_sprite()
     update_and_draw_egg(egg_displacement)
     pygame.display.update()
@@ -36,11 +38,10 @@ def draw_window(egg_displacement = 0):
 
 def update_and_draw_egg(egg_displacement):
     # TODO: Debug whatever this is: workaround- added a buffer length
-    buffer = egg.width / 2 + 10
-    print (egg.x, " : ", egg_displacement, " : ",  egg.x + egg_displacement)
+    buffer = 28
     if(egg.x + egg_displacement < ROAD_X - buffer):
         return
-    if(egg.x + egg_displacement >= ROAD_X + ROAD_WIDTH - buffer):
+    if(egg.x + egg.width + egg_displacement >= ROAD_X + ROAD_WIDTH + buffer):
         return
     egg.update_position(egg.x + egg_displacement)
     egg.draw_egg(egg_displacement)
@@ -60,6 +61,7 @@ clock = pygame.time.Clock()
 run =  True
 print("Starting game", screen)
 egg = Egg(screen, 250)
+bg = Background(screen, WIDTH + 20, HEIGHT)
 # Game loop
 while running:
     # Event handling
@@ -68,7 +70,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    # Write code to get the key pressed
+    # Key pressed
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:
         egg_displacement = -VELOCITY
@@ -76,7 +78,6 @@ while running:
         egg_displacement = VELOCITY
     else:
         egg_displacement = 0    
-    
          
     # Update game logic
     draw_window(egg_displacement)
