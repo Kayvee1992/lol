@@ -4,6 +4,8 @@ import pygame
 from egg import *
 from road import Road
 from car import Car
+from util import *
+pygame.font.init()
 
 # Constants
 
@@ -23,7 +25,10 @@ ROAD_WIDTH = 200
 ROAD_X = 200
 ROAD_Y = 0
 CAR_WIDTH = 50
-CAR_HEIGHT = 100
+CAR_HEIGHT = 80
+
+# Fonts
+
 
 # Set up the display
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -32,11 +37,11 @@ pygame.display.set_caption("lol")
 all_sprites = pygame.sprite.Group()
 
 # Drawing the window
-def draw_window(egg_displacement = 0):
+def draw_window(egg_displacement = 0, crashed = False):
     screen.fill(WHITE)
     bg.draw_bg()
     draw_and_update_sprite()
-    update_and_draw_egg(egg_displacement)
+    update_and_draw_egg(egg_displacement, crashed)
     draw_cars()
     pygame.display.update()
     
@@ -45,16 +50,17 @@ def draw_cars():
     for car in cars:
         car.draw_car()
 
-def update_and_draw_egg(egg_displacement):
-    # TODO: Debug whatever this is: workaround- added a buffer length
-    buffer = 28
+def update_and_draw_egg(egg_displacement, crashed):
+    buffer = 0
+    if (crashed):
+        egg.draw_broken_egg(egg_displacement)
+        return
     if(egg.rect.x + egg_displacement < ROAD_X - buffer):
         return
     if(egg.rect.x + egg.width + egg_displacement >= ROAD_X + ROAD_WIDTH + buffer):
         return
     egg.update_position(egg.rect.x + egg_displacement)
     egg.draw_egg(egg_displacement)
-
 
 
 def draw_and_update_sprite():
@@ -80,13 +86,7 @@ def get_random_number():
     return random.randint(1, 5) 
 
 def get_random_road_position():
-    return random.randint(200, 400)
-
-def get_random_color():
-    red = random.randint(0, 255)
-    green = random.randint(0, 255)
-    blue = random.randint(0, 255)
-    return (red, green, blue)
+    return random.randint(200, 350)
 
 
 def handle_cars():
@@ -97,15 +97,22 @@ def handle_cars():
 def update_cars():
     for car in cars:
         car.update()
-        if car.rect.y > HEIGHT:
+        if car.rect.y > HEIGHT + CAR_HEIGHT:
             cars.remove(car)
 
-
 def create_car(x, y, width, height, color):
-    if (get_random_number() % 2 == 0 and len(cars) < 2):
+    if (get_random_number() % 2 == 0 and len(cars) < 3):
+        if(len(cars) > 1 and cars[len(cars)-1].rect.y < 100):
+            return
         print("Creating car")
         car = Car(screen, x, y, width, height, color)
         cars.append(car)
+
+def detect_collision():
+    for car in cars:
+        if (egg.rect.colliderect(car.rect)):
+            print("Collision detected")
+            return True 
 
 # Main loop
 running = True
@@ -124,15 +131,20 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    # Update game logic
     # Key pressed
     keys = pygame.key.get_pressed()
     egg_displacement = calculate_egg_displacement(VELOCITY, keys)    
          
     handle_cars()
-    # Update game logic
-    draw_window(egg_displacement)
-
+    crashed = False
+    if detect_collision():
+        running = False
+        crashed = True
+    draw_window(egg_displacement, crashed)
+    if crashed:
+        print("Game Over")
+        pygame.time.delay(3000)
     
-
 # Quit Pygame
 pygame.quit()
