@@ -9,16 +9,18 @@ BROKEN_EGG = pygame.transform.scale(BROKEN_EGG_IMAGE, (100, 76))
 
 
 class Egg():
+
     def __init__(self, screen, x, y = 730):
         super().__init__()
         self.screen = screen
-        self.x = x
-        self.y = y
-        self.width = 100
-        self.height = 76
+        width = 100
+        height = 76
+        self.rect = pygame.Rect(x, y, width, height)
+        self.width = width
+        self.height = height
 
     def update_position(self, x):
-        self.x = x
+        self.rect.x = x
     
     def draw_egg(self, x = 0):
-        self.screen.blit(EGG, (self.x, self.y))
+        self.screen.blit(EGG, (self.rect.x, self.rect.y))
