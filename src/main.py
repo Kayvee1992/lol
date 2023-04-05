@@ -17,6 +17,8 @@ WHITE = (255, 255, 255)
 YELLOW = (255, 255, 102)
 GREY = (128, 128, 128)
 BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+DARK_RED = (200, 0, 0)
 
 # Dimensions and positions
 WIDTH = 600
@@ -28,6 +30,9 @@ CAR_WIDTH = 50
 CAR_HEIGHT = 80
 
 # Fonts
+SCORE_FONT = pygame.font.SysFont('comicsans', 30)
+FINAL_SCORE_FONT = pygame.font.SysFont('comicsans', 50)
+GAME_OVER_FONT = pygame.font.SysFont('comicsans', 70)
 
 
 # Set up the display
@@ -37,13 +42,26 @@ pygame.display.set_caption("lol")
 all_sprites = pygame.sprite.Group()
 
 # Drawing the window
-def draw_window(egg_displacement = 0, crashed = False):
+def draw_window(egg_displacement = 0, crashed = False, score = 0):
     screen.fill(WHITE)
     bg.draw_bg()
+    render_score(score)
     draw_and_update_sprite()
     update_and_draw_egg(egg_displacement, crashed)
     draw_cars()
+    if crashed:
+        render_final_score(score)
     pygame.display.update()
+
+def render_final_score(score):
+    game_over_text = GAME_OVER_FONT.render("GAME OVER", 1, DARK_RED)
+    score_text = FINAL_SCORE_FONT.render("SCORE: " + str(score), 1, WHITE)
+    screen.blit(score_text, (WIDTH/2 - score_text.get_width()/2, HEIGHT/2 - score_text.get_height()/2))
+    screen.blit(game_over_text, (WIDTH/2 - game_over_text.get_width()/2, HEIGHT/2 - game_over_text.get_height()/2 - 100))
+
+def render_score(score):
+    score_text = SCORE_FONT.render("Score: " + str(score), 1, WHITE)
+    screen.blit(score_text, (10, 10))
     
 # Code to update the cars
 def draw_cars():
@@ -123,10 +141,12 @@ print("Starting game....", screen)
 egg = Egg(screen, 250)
 bg = Background(screen, WIDTH + 20, HEIGHT)
 cars = []
+score = 0
 # Game loop
 while running:
     # Event handling
     clock.tick(FPS)
+    score = score + 1
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -141,7 +161,7 @@ while running:
     if detect_collision():
         running = False
         crashed = True
-    draw_window(egg_displacement, crashed)
+    draw_window(egg_displacement, crashed, score)
     if crashed:
         print("Game Over")
         pygame.time.delay(3000)
