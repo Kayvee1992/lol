@@ -1,7 +1,7 @@
 import pygame
 import os
 
-EGG_WIDTH = 40
+EGG_WIDTH = 35
 EGG_HEIGHT = 45
 
 EGG_IMAGE = pygame.image.load(os.path.join('assets', 'pixel-egg.png'))

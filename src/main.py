@@ -7,8 +7,9 @@ from car import Car
 from util import *
 pygame.font.init()
 
-# Constants
+################## Constants ##################
 
+# Game variables
 FPS = 60
 VELOCITY = 2
 
@@ -46,7 +47,7 @@ def draw_window(egg_displacement = 0, crashed = False, score = 0):
     screen.fill(WHITE)
     bg.draw_bg()
     render_score(score)
-    draw_and_update_sprite()
+    update_and_draw_sprite()
     update_and_draw_egg(egg_displacement, crashed)
     draw_cars()
     if crashed:
@@ -81,7 +82,7 @@ def update_and_draw_egg(egg_displacement, crashed):
     egg.draw_egg(egg_displacement)
 
 
-def draw_and_update_sprite():
+def update_and_draw_sprite():
     all_sprites.update()
     # update the sprites
     all_sprites.draw(screen)
@@ -106,11 +107,9 @@ def get_random_number():
 def get_random_road_position():
     return random.randint(200, 350)
 
-
 def handle_cars():
     create_car(get_random_road_position(), -CAR_HEIGHT, CAR_WIDTH, CAR_HEIGHT, get_random_color())
     update_cars()
-
 
 def update_cars():
     for car in cars:
@@ -123,7 +122,7 @@ def create_car(x, y, width, height, color):
         if(len(cars) > 1 and cars[len(cars)-1].rect.y < 100):
             return
         print("Creating car")
-        car = Car(screen, x, y, width, height, color)
+        car = Car(screen, x, y, width, height)
         cars.append(car)
 
 def detect_collision():
@@ -132,7 +131,9 @@ def detect_collision():
             print("Collision detected")
             return True 
 
-# Main loop
+
+################## Main ##################
+
 running = True
 clock = pygame.time.Clock()
 run =  True
@@ -144,27 +145,27 @@ cars = []
 score = 0
 # Game loop
 while running:
-    # Event handling
     clock.tick(FPS)
     score = score + 1
+    crashed = False
+
+    ################## Events ##################
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    # Update game logic
-    # Key pressed
+    ################## Update game logic ##################
     keys = pygame.key.get_pressed()
     egg_displacement = calculate_egg_displacement(VELOCITY, keys)    
          
     handle_cars()
-    crashed = False
     if detect_collision():
         running = False
         crashed = True
     draw_window(egg_displacement, crashed, score)
     if crashed:
         print("Game Over")
-        pygame.time.delay(3000)
+        pygame.time.delay(4000)
     
 # Quit Pygame
 pygame.quit()
